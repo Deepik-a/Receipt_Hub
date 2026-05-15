@@ -1,0 +1,54 @@
+//Adonis.js (AdonisJS) is a full-stack web framework for Node.js, written in TypeScript
+
+//OAT — Opaque Access Token
+//OAT stands for Opaque Access Token. It is one of the authentication guards provided by AdonisJS's built-in auth system.
+
+1. User registers / logs in
+           ↓
+2. Server generates a random token string
+           ↓
+3. Token is saved in the database (auth_access_tokens table)
+           ↓
+4. Token is returned to the client once
+           ↓
+5. Client sends token in every request header:
+   Authorization: Bearer oat_abc123...
+           ↓
+6. Server looks up token in DB → identifies the user
+
+
+//Both work great with AdonisJS, but here's a practical breakdown:
+PostgreSQL vs MySQL with AdonisJS
+
+For Your Use Case (Saved Recipes / User Preferences)
+Go with PostgreSQL — here's why:
+
+Saved recipes are semi-structured data — Postgres's JSONB columns let you store flexible recipe data without extra tables
+User preferences often evolve — Postgres handles schema changes and complex queries better
+Better with AdonisJS Lucid ORM — Postgres-specific features like jsonb, arrays, and full-text search are well-supported
+Free tier options — Supabase and Neon offer generous free Postgres hostin
+
+//https://claude.ai/chat/d3f5cb52-64f3-442f-82ed-689f29acfe9b
+
+
+
+🧠 Redux Toolkit vs Zustand (quick reality check)
+🔷 Redux Toolkit
+More structured / boilerplate-heavy
+Great for large, complex apps
+Requires:
+slices
+reducers
+store setup
+provider
+🟢 Zustand
+Lightweight & simple
+No reducers, no boilerplate
+Works great for:
+auth state
+UI state
+small–medium apps
+
+
+
+//Express + built-in authentication + ORM + validation + project structure + TypeScript support.

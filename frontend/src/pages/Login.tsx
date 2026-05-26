@@ -1,19 +1,36 @@
 import { useState, useEffect } from 'react'
-import type { FormEvent, ChangeEvent } from 'react'
+import type { FormEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import AuthLayout, { AuthLink } from '@/components/AuthLayout'
-import { inputClass, primaryBtnClass, secondaryBtnClass } from '@/components/authFormStyles'
+import FormField from '@/components/FormField'
+import PasswordField from '@/components/PasswordField'
+import { primaryBtnClass, secondaryBtnClass } from '@/components/authFormStyles'
+import { useFormValidation } from '@/hooks/useFormValidation'
 import authService from '@/services/authService'
 import useAuthStore from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/apiError'
+import { validateEmail, validatePasswordForLogin } from '@/utils/authValidation'
+
+type LoginForm = {
+  email: string
+  password: string
+}
 
 const Login = () => {
-  const [form, setForm] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
   const location = useLocation()
   const { setAuth, isAuthenticated } = useAuthStore()
+
+  const { values, handleChange, handleBlur, validateAll, getFieldError, isFormValid } =
+    useFormValidation<LoginForm>({
+      initialValues: { email: '', password: '' },
+      validators: {
+        email: (value) => validateEmail(value),
+        password: (value) => validatePasswordForLogin(value),
+      },
+    })
 
   const successMessage = (location.state as { message?: string } | null)?.message
 
@@ -23,17 +40,17 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (!validateAll()) {
+      return
+    }
+
     setLoading(true)
     setError(null)
 
     try {
-      const data = await authService.login(form)
+      const data = await authService.login(values)
       setAuth(data.token, data.user)
       navigate('/')
     } catch (err) {
@@ -57,7 +74,7 @@ const Login = () => {
         </p>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {successMessage && (
           <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
             {successMessage}
@@ -66,31 +83,30 @@ const Login = () => {
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
-        <input
-          type="email"
+        <FormField
           name="email"
-          placeholder="Email"
-          required
+          label="Email"
+          inputMode="email"
           autoComplete="email"
-          value={form.email}
+          value={values.email}
+          error={getFieldError('email')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
-        <input
-          type="password"
+        <PasswordField
           name="password"
+          label="Password"
           placeholder="Password"
-          required
           autoComplete="current-password"
-          minLength={8}
-          value={form.password}
+          value={values.password}
+          error={getFieldError('password')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
         <p className="text-right">
           <AuthLink to="/forgot-password">Forgot password?</AuthLink>
         </p>
-        <button type="submit" disabled={loading} className={primaryBtnClass}>
+        <button type="submit" disabled={loading || !isFormValid} className={primaryBtnClass}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
         <button type="button" onClick={handleGoogleLogin} className={secondaryBtnClass}>

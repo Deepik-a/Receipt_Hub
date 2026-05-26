@@ -2,6 +2,41 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import authService from '@/services/authService'
 import useAuthStore from '@/store/authStore'
+import type { AuthUser } from '@/types/user'
+
+/** Decode base64url (RFC 4648) to UTF-8 string */
+function decodeBase64UrlToUtf8(value: string): string {
+  const pad = value.length % 4 === 0 ? '' : '='.repeat(4 - (value.length % 4))
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/') + pad
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return new TextDecoder().decode(bytes)
+}
+
+function parseUserFromCallback(searchParams: URLSearchParams): AuthUser | null {
+  const profile = searchParams.get('profile')
+  if (profile) {
+    try {
+      return JSON.parse(decodeBase64UrlToUtf8(profile)) as AuthUser
+    } catch {
+      return null
+    }
+  }
+
+  const legacyUser = searchParams.get('user')
+  if (legacyUser) {
+    try {
+      return JSON.parse(legacyUser) as AuthUser
+    } catch {
+      return null
+    }
+  }
+
+  return null
+}
 
 const AuthCallback = () => {
   const [searchParams] = useSearchParams()
@@ -24,6 +59,13 @@ const AuthCallback = () => {
     }
 
     localStorage.setItem('token', token)
+
+    const userFromUrl = parseUserFromCallback(searchParams)
+    if (userFromUrl) {
+      setAuth(token, userFromUrl)
+      navigate('/', { replace: true })
+      return
+    }
 
     authService
       .me()

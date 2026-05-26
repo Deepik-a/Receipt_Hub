@@ -1,9 +1,10 @@
 import vine from '@vinejs/vine'
+import { passwordRule } from '#validators/password_rules'
 
 export const loginValidator = vine.compile(
   vine.object({
     email: vine.string().email().trim().toLowerCase(),
-    password: vine.string().minLength(8),
+    password: vine.string().minLength(1),
   })
 )
 
@@ -11,8 +12,8 @@ export const registerValidator = vine.compile(
   vine.object({
     fullName: vine.string().trim().minLength(2).maxLength(100),
     email: vine.string().email().trim().toLowerCase(),
-    password: vine.string().minLength(8).maxLength(72),
-    confirmPassword: vine.string().minLength(8).maxLength(72),
+    password: passwordRule(),
+    confirmPassword: passwordRule(),
   })
 )
 
@@ -26,12 +27,27 @@ export const resetPasswordValidator = vine.compile(
   vine.object({
     email: vine.string().email().trim().toLowerCase(),
     otp: vine.string().fixedLength(6),
-    password: vine.string().minLength(8).maxLength(72),
-    confirmPassword: vine.string().minLength(8).maxLength(72),
+    password: passwordRule(),
+    confirmPassword: passwordRule(),
   })
 )
 
 export const verifyOtpValidator = vine.compile(
+  vine.object({
+    email: vine.string().email().trim().toLowerCase(),
+    otp: vine.string().fixedLength(6),
+    purpose: vine.enum(['register', 'password_reset']).optional(),
+  })
+)
+
+export const resendOtpValidator = vine.compile(
+  vine.object({
+    email: vine.string().email().trim().toLowerCase(),
+    purpose: vine.enum(['register', 'password_reset']),
+  })
+)
+
+export const verifyRegistrationValidator = vine.compile(
   vine.object({
     email: vine.string().email().trim().toLowerCase(),
     otp: vine.string().fixedLength(6),

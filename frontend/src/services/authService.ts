@@ -5,17 +5,30 @@ import type {
   ForgotPasswordRequest,
   LoginRequest,
   MessageResponse,
+  RegisterPendingResponse,
   RegisterRequest,
+  ResendOtpRequest,
   ResetPasswordRequest,
   VerifyOtpRequest,
   VerifyOtpResponse,
+  VerifyRegistrationRequest,
 } from '@/types/user'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333/api'
 
 const authService = {
-  async register(payload: RegisterRequest): Promise<AuthTokenResponse> {
-    const response = await api.post<AuthTokenResponse>('/auth/register', payload)
+  async register(payload: RegisterRequest): Promise<RegisterPendingResponse> {
+    const response = await api.post<RegisterPendingResponse>('/auth/register', payload)
+    return response.data
+  },
+
+  async verifyRegistration(payload: VerifyRegistrationRequest): Promise<AuthTokenResponse> {
+    const response = await api.post<AuthTokenResponse>('/auth/verify-registration', payload)
+    return response.data
+  },
+
+  async resendOtp(payload: ResendOtpRequest): Promise<MessageResponse> {
+    const response = await api.post<MessageResponse>('/auth/resend-otp', payload)
     return response.data
   },
 

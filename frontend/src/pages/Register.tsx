@@ -1,23 +1,53 @@
 import { useState, useEffect } from 'react'
-import type { FormEvent, ChangeEvent } from 'react'
+import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthLayout, { AuthLink } from '@/components/AuthLayout'
-import { inputClass, primaryBtnClass, secondaryBtnClass } from '@/components/authFormStyles'
+import FormField from '@/components/FormField'
+import PasswordField from '@/components/PasswordField'
+import { primaryBtnClass, secondaryBtnClass } from '@/components/authFormStyles'
+import { useFormValidation } from '@/hooks/useFormValidation'
 import authService from '@/services/authService'
 import useAuthStore from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/apiError'
+import {
+  validateConfirmPassword,
+  validateEmail,
+  validateFullName,
+  validatePassword,
+} from '@/utils/authValidation'
+import { startOtpCooldown } from '@/utils/otpCooldown'
+
+type RegisterForm = {
+  fullName: string
+  email: string
+  password: string
+  confirmPassword: string
+}
 
 const Register = () => {
-  const [form, setForm] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
-  const { setAuth, isAuthenticated } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
+
+  const { values, handleChange, handleBlur, validateAll, getFieldError, isFormValid } =
+    useFormValidation<RegisterForm>({
+      initialValues: {
+        fullName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      },
+      validators: {
+        fullName: (value) => validateFullName(value),
+        email: (value) => validateEmail(value),
+        password: (value) => validatePassword(value),
+        confirmPassword: (value, form) => validateConfirmPassword(form.password, value),
+      },
+      relatedFields: {
+        password: ['confirmPassword'],
+      },
+    })
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,25 +55,25 @@ const Register = () => {
     }
   }, [isAuthenticated, navigate])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-
-    if (form.password !== form.confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
+    if (!validateAll()) {
       return
     }
 
+    setLoading(true)
+    setError(null)
+
     try {
-      const data = await authService.register(form)
-      setAuth(data.token, data.user)
-      navigate('/')
+      const data = await authService.register(values)
+      startOtpCooldown(data.email, 'register')
+      navigate('/verify-otp', {
+        state: {
+          email: data.email,
+          purpose: 'register',
+          message: data.message,
+        },
+      })
     } catch (err) {
       setError(getApiErrorMessage(err, 'Registration failed'))
     } finally {
@@ -59,60 +89,56 @@ const Register = () => {
     <AuthLayout
       title="Create account"
       subtitle="Join Recipe Hub — it only takes a minute"
-      step={{ current: 1, total: 1 }}
+      step={{ current: 1, total: 2 }}
       footer={
         <p className="text-center text-sm text-gray-600">
           Already have an account? <AuthLink to="/login">Sign in</AuthLink>
         </p>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
-        <input
-          type="text"
+        <FormField
           name="fullName"
-          placeholder="Full name"
-          required
+          label="Full name"
           autoComplete="name"
-          value={form.fullName}
+          value={values.fullName}
+          error={getFieldError('fullName')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
-        <input
-          type="email"
+        <FormField
           name="email"
-          placeholder="Email"
-          required
+          label="Email"
+          inputMode="email"
           autoComplete="email"
-          value={form.email}
+          value={values.email}
+          error={getFieldError('email')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
-        <input
-          type="password"
+        <PasswordField
           name="password"
-          placeholder="Password (min 8 characters)"
-          required
-          minLength={8}
+          label="Password"
+          placeholder="Min 8 chars, upper, lower, number, symbol"
           autoComplete="new-password"
-          value={form.password}
+          value={values.password}
+          error={getFieldError('password')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
-        <input
-          type="password"
+        <PasswordField
           name="confirmPassword"
-          placeholder="Confirm password"
-          required
-          minLength={8}
+          label="Confirm password"
           autoComplete="new-password"
-          value={form.confirmPassword}
+          value={values.confirmPassword}
+          error={getFieldError('confirmPassword')}
           onChange={handleChange}
-          className={inputClass}
+          onBlur={handleBlur}
         />
-        <button type="submit" disabled={loading} className={primaryBtnClass}>
+        <button type="submit" disabled={loading || !isFormValid} className={primaryBtnClass}>
           {loading ? 'Creating account...' : 'Sign up'}
         </button>
         <button type="button" onClick={handleGoogleSignup} className={secondaryBtnClass}>

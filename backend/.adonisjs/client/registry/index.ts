@@ -12,6 +12,18 @@ const routes = {
     tokens: [{"old":"/api/auth/register","type":0,"val":"api","end":""},{"old":"/api/auth/register","type":0,"val":"auth","end":""},{"old":"/api/auth/register","type":0,"val":"register","end":""}],
     types: placeholder as Registry['auth.register']['types'],
   },
+  'auth.verify_registration': {
+    methods: ["POST"],
+    pattern: '/api/auth/verify-registration',
+    tokens: [{"old":"/api/auth/verify-registration","type":0,"val":"api","end":""},{"old":"/api/auth/verify-registration","type":0,"val":"auth","end":""},{"old":"/api/auth/verify-registration","type":0,"val":"verify-registration","end":""}],
+    types: placeholder as Registry['auth.verify_registration']['types'],
+  },
+  'auth.resend_otp': {
+    methods: ["POST"],
+    pattern: '/api/auth/resend-otp',
+    tokens: [{"old":"/api/auth/resend-otp","type":0,"val":"api","end":""},{"old":"/api/auth/resend-otp","type":0,"val":"auth","end":""},{"old":"/api/auth/resend-otp","type":0,"val":"resend-otp","end":""}],
+    types: placeholder as Registry['auth.resend_otp']['types'],
+  },
   'auth.login': {
     methods: ["POST"],
     pattern: '/api/auth/login',
@@ -48,6 +60,42 @@ const routes = {
     tokens: [{"old":"/api/auth/google/callback","type":0,"val":"api","end":""},{"old":"/api/auth/google/callback","type":0,"val":"auth","end":""},{"old":"/api/auth/google/callback","type":0,"val":"google","end":""},{"old":"/api/auth/google/callback","type":0,"val":"callback","end":""}],
     types: placeholder as Registry['auth.google_callback']['types'],
   },
+  'favorites.get_ids': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/recipes/favorites/ids',
+    tokens: [{"old":"/api/recipes/favorites/ids","type":0,"val":"api","end":""},{"old":"/api/recipes/favorites/ids","type":0,"val":"recipes","end":""},{"old":"/api/recipes/favorites/ids","type":0,"val":"favorites","end":""},{"old":"/api/recipes/favorites/ids","type":0,"val":"ids","end":""}],
+    types: placeholder as Registry['favorites.get_ids']['types'],
+  },
+  'favorites.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/recipes/favorites',
+    tokens: [{"old":"/api/recipes/favorites","type":0,"val":"api","end":""},{"old":"/api/recipes/favorites","type":0,"val":"recipes","end":""},{"old":"/api/recipes/favorites","type":0,"val":"favorites","end":""}],
+    types: placeholder as Registry['favorites.index']['types'],
+  },
+  'favorites.toggle': {
+    methods: ["POST"],
+    pattern: '/api/recipes/favorites/toggle',
+    tokens: [{"old":"/api/recipes/favorites/toggle","type":0,"val":"api","end":""},{"old":"/api/recipes/favorites/toggle","type":0,"val":"recipes","end":""},{"old":"/api/recipes/favorites/toggle","type":0,"val":"favorites","end":""},{"old":"/api/recipes/favorites/toggle","type":0,"val":"toggle","end":""}],
+    types: placeholder as Registry['favorites.toggle']['types'],
+  },
+  'recipes.search': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/recipes/search',
+    tokens: [{"old":"/api/recipes/search","type":0,"val":"api","end":""},{"old":"/api/recipes/search","type":0,"val":"recipes","end":""},{"old":"/api/recipes/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['recipes.search']['types'],
+  },
+  'recipes.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/recipes/:id',
+    tokens: [{"old":"/api/recipes/:id","type":0,"val":"api","end":""},{"old":"/api/recipes/:id","type":0,"val":"recipes","end":""},{"old":"/api/recipes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recipes.show']['types'],
+  },
+  'profile.serve_avatar': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/uploads/avatars/:filename',
+    tokens: [{"old":"/api/uploads/avatars/:filename","type":0,"val":"api","end":""},{"old":"/api/uploads/avatars/:filename","type":0,"val":"uploads","end":""},{"old":"/api/uploads/avatars/:filename","type":0,"val":"avatars","end":""},{"old":"/api/uploads/avatars/:filename","type":1,"val":"filename","end":""}],
+    types: placeholder as Registry['profile.serve_avatar']['types'],
+  },
   'auth.me': {
     methods: ["GET","HEAD"],
     pattern: '/api/auth/me',
@@ -59,6 +107,30 @@ const routes = {
     pattern: '/api/auth/logout',
     tokens: [{"old":"/api/auth/logout","type":0,"val":"api","end":""},{"old":"/api/auth/logout","type":0,"val":"auth","end":""},{"old":"/api/auth/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['auth.logout']['types'],
+  },
+  'preferences.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/user/preferences',
+    tokens: [{"old":"/api/user/preferences","type":0,"val":"api","end":""},{"old":"/api/user/preferences","type":0,"val":"user","end":""},{"old":"/api/user/preferences","type":0,"val":"preferences","end":""}],
+    types: placeholder as Registry['preferences.show']['types'],
+  },
+  'preferences.update': {
+    methods: ["PUT"],
+    pattern: '/api/user/preferences',
+    tokens: [{"old":"/api/user/preferences","type":0,"val":"api","end":""},{"old":"/api/user/preferences","type":0,"val":"user","end":""},{"old":"/api/user/preferences","type":0,"val":"preferences","end":""}],
+    types: placeholder as Registry['preferences.update']['types'],
+  },
+  'profile.update_avatar': {
+    methods: ["POST"],
+    pattern: '/api/user/avatar',
+    tokens: [{"old":"/api/user/avatar","type":0,"val":"api","end":""},{"old":"/api/user/avatar","type":0,"val":"user","end":""},{"old":"/api/user/avatar","type":0,"val":"avatar","end":""}],
+    types: placeholder as Registry['profile.update_avatar']['types'],
+  },
+  'profile.change_password': {
+    methods: ["POST"],
+    pattern: '/api/user/change-password',
+    tokens: [{"old":"/api/user/change-password","type":0,"val":"api","end":""},{"old":"/api/user/change-password","type":0,"val":"user","end":""},{"old":"/api/user/change-password","type":0,"val":"change-password","end":""}],
+    types: placeholder as Registry['profile.change_password']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

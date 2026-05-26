@@ -5,4 +5,8 @@
 
 export const controllers = {
   Auth: () => import('#controllers/auth_controller'),
+  Favorites: () => import('#controllers/favorites_controller'),
+  Preferences: () => import('#controllers/preferences_controller'),
+  Profile: () => import('#controllers/profile_controller'),
+  Recipes: () => import('#controllers/recipes_controller'),
 }

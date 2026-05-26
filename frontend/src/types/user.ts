@@ -25,6 +25,17 @@ export interface ForgotPasswordRequest {
 export interface VerifyOtpRequest {
   email: string
   otp: string
+  purpose?: 'register' | 'password_reset'
+}
+
+export interface VerifyRegistrationRequest {
+  email: string
+  otp: string
+}
+
+export interface ResendOtpRequest {
+  email: string
+  purpose: 'register' | 'password_reset'
 }
 
 export interface ResetPasswordRequest {
@@ -40,6 +51,11 @@ export interface AuthTokenResponse {
   user: AuthUser
 }
 
+export interface RegisterPendingResponse {
+  message: string
+  email: string
+}
+
 export interface MessageResponse {
   message: string
 }
@@ -48,3 +64,5 @@ export interface VerifyOtpResponse {
   message: string
   valid: boolean
 }
+
+export type OtpPurpose = 'register' | 'password_reset'

@@ -4,6 +4,8 @@
 |--------------------------------------------------------------------------
 */
 
+//Validates and reads environment variables
+
 import { Env } from '@adonisjs/core/env'
 
 export default await Env.create(new URL('../', import.meta.url), {
@@ -31,4 +33,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   GOOGLE_CLIENT_ID: Env.schema.string(),
   GOOGLE_CLIENT_SECRET: Env.schema.string(),
+  SPOONACULAR_API_KEY: Env.schema.string.optional(),
+
+  SMTP_HOST: Env.schema.string.optional(),
+  SMTP_PORT: Env.schema.number.optional(),
+  SMTP_USER: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.string.optional(),
+  SMTP_SECURE: Env.schema.boolean.optional(),
+  MAIL_FROM: Env.schema.string.optional(),
 })

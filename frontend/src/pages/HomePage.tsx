@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/store/authStore";
-import authService from "@/services/authService";
+import RecipeSearch from "@/components/RecipeSearch"
 
 // ─── Intersection Observer Hook (improved threshold) ─────────────────────
 function useInView(threshold = 0.2, triggerOnce = true) {
@@ -65,239 +63,90 @@ function FadeUp({ children, delay = 0, className = "" }) {
   );
 }
 
-// ─── Modern Navbar with glass effect ─────────────────────────────────────
-function Navbar() {
-  const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuthStore();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const links = ["Home", "About Us","Recipies", "Cuisines", "Categories","Contact"];
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch {
-      // Clear local session even if API call fails
-    }
-    logout();
-    navigate("/");
-  };
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <nav 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled ? 'glass-morphism' : 'bg-transparent'
-      }`} 
-      style={{ backdropFilter: scrolled ? 'blur(14px)' : 'none' }}
-    >
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-20">
-        <span className="font-['Parisienne',cursive] text-3xl md:text-4xl bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent tracking-wide drop-shadow-sm">
-          RecipieHub
-        </span>
-        <div className="hidden md:flex items-center gap-8 lg:gap-10">
-          <ul className="flex items-center gap-8 lg:gap-10 text-[13px] text-gray-200 font-medium tracking-wider uppercase">
-            {links.map(l => (
-              <li key={l}>
-                <a href="#" className={`relative pb-1 transition-all duration-300 hover:text-amber-400 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-amber-400 after:transition-all after:duration-300 hover:after:w-full ${
-                  l === "Home" ? "text-amber-400 after:w-full" : ""
-                }`}>
-                  {l}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <>
-                <span className="text-sm text-amber-200/90 normal-case tracking-normal">
-                  Hi, {user?.fullName?.split(" ")[0] ?? "Chef"}
-                </span>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="rounded-full border border-amber-400/60 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 transition hover:bg-amber-400/10"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => navigate("/login")}
-                  className="rounded-full border border-amber-400/60 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-amber-300 transition hover:bg-amber-400/10"
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate("/register")}
-                  className="rounded-full bg-amber-500 px-5 py-2 text-xs font-semibold uppercase tracking-wider text-[#1a1208] transition hover:bg-amber-400"
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-        <button 
-          className="md:hidden flex flex-col gap-1.5 p-2" 
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {[0,1,2].map(i => (
-            <span 
-              key={i} 
-              className="block w-6 h-0.5 bg-gray-200 transition-all duration-300" 
-              style={{
-                opacity: menuOpen && i===1 ? 0 : 1,
-                transform: menuOpen && i===0 ? "rotate(45deg) translateY(8px)" : menuOpen && i===2 ? "rotate(-45deg) translateY(-8px)" : "none"
-              }} 
-            />
-          ))}
-        </button>
-      </div>
-      <div 
-        className="md:hidden overflow-hidden transition-all duration-500" 
-        style={{ maxHeight: menuOpen ? "460px" : "0", background: "rgba(10,7,5,0.98)", backdropFilter: "blur(12px)" }}
-      >
-        <ul className="flex flex-col px-8 pb-8 pt-3 gap-2">
-          {links.map(l => (
-            <li key={l} className="border-b border-white/10">
-              <a href="#" className="block py-3 text-gray-200 tracking-wider hover:text-amber-400 transition">
-                {l}
-              </a>
-            </li>
-          ))}
-          <li className="border-b border-white/10 pt-2">
-            {isAuthenticated ? (
-              <>
-                <p className="py-2 text-amber-300 text-sm">
-                  Hi, {user?.fullName?.split(" ")[0] ?? "Chef"}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="block w-full py-3 text-left text-gray-200 tracking-wider hover:text-amber-400 transition"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/login");
-                  }}
-                  className="block w-full py-3 text-left text-gray-200 tracking-wider hover:text-amber-400 transition"
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    navigate("/register");
-                  }}
-                  className="block w-full py-3 text-left text-amber-400 tracking-wider hover:text-amber-300 transition"
-                >
-                  Sign up
-                </button>
-              </>
-            )}
-          </li>
-        </ul>
-      </div>
-    </nav>
-  );
-}
 
 // ─── Hero section (modern, dynamic, improved images) ──────────────────
 function Hero() {
   const [loaded, setLoaded] = useState(false);
-  useEffect(() => { setTimeout(() => setLoaded(true), 80); }, []);
-  
-  return (
-  <section 
-  className="relative min-h-screen flex items-center overflow-hidden" 
-  style={{ background: "radial-gradient(circle at 30% 10%, #1f160e, #080604)" }}
->
-  {/* Background Video */}
- <div className="absolute inset-0 z-0">
-  <video
-    autoPlay
-    loop
-    muted
-    playsInline
-    className="w-full h-full object-cover"
-    style={{ filter: "brightness(0.85) contrast(1.15)" }}
-  >
-    <source src="/HeroVideo.mp4" type="video/mp4" />
-    {/* Fallback image if video doesn't load */}
-    <img src="/HomePageImage.jpg" alt="Background" className="w-full h-full object-cover" />
-  </video>
-</div>
-  
+  useEffect(() => {
+    const t = setTimeout(() => setLoaded(true), 80);
+    return () => clearTimeout(t);
+  }, []);
  
-  
-  <div className="max-w-7xl mx-auto px-6 sm:px-10 w-full pt-28 pb-20 relative z-10">
-    <div className="grid lg:grid-cols-2 items-center gap-12 lg:gap-16">
-      {/* Left text */}
-      <div 
-        className="order-2 lg:order-1" 
-        style={{ 
-          opacity: loaded ? 1 : 0, 
-          transform: loaded ? "translateX(0)" : "translateX(-50px)", 
-          transition: "all 1s cubic-bezier(0.2, 0.9, 0.4, 1.2) 0.2s" 
-        }}
-      >
-        <h1 className="font-['Cormorant_Garamond',serif] text-white font-bold text-5xl sm:text-6xl xl:text-7xl leading-[1.2] tracking-tight">
-         FROM OUR HUB <br />
-         TO YOUR HOME<br />
-        </h1>
-        <p className="mt-6 text-gray-200 text-base max-w-md leading-relaxed border-l-2 border-amber-500/50 pl-5 backdrop-blur-sm bg-black/20 rounded-r-lg pr-2">
-           We believe cooking should be joyful, not stressful. That's why every recipe on 
-        <span className="font-['Parisienne',cursive] text-amber-400 text-2xl md:text-3xl mb-3"> RecipieHub  </span> is carefully curated, easy to follow, and absolutely delicious.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-5">
-          <button className="px-8 py-3.5 bg-amber-500 hover:bg-amber-600 text-black font-bold text-sm tracking-wider uppercase rounded-full shadow-lg transition-all duration-300 hover:scale-105">
-          Explore Our Recipe
-          </button>
-          <button className="px-8 py-3.5 border border-white/30 text-white text-sm tracking-wider uppercase rounded-full hover:border-amber-400 hover:text-amber-400 transition-all duration-300 backdrop-blur-sm">
-          View Cuisines
-          </button>
+  return (
+    <section
+      className="relative min-h-screen flex flex-col overflow-hidden"
+      style={{ background: "radial-gradient(circle at 30% 10%, #1f160e, #080604)" }}
+    >
+      {/* Background Video */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover"
+          style={{ filter: "brightness(0.85) contrast(1.15)" }}
+        >
+          <source src="/HeroVideo.mp4" type="video/mp4" />
+          <img
+            src="/HomePageImage.jpg"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
+        </video>
+        {/* extra dark veil so results grid is readable */}
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
+ 
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 w-full pt-28 pb-24 relative z-10 flex-1">
+        <div className="grid lg:grid-cols-2 items-start gap-12 lg:gap-16">
+          {/* Left text + search */}
+          <div
+            className="order-2 lg:order-1"
+            style={{
+              opacity: loaded ? 1 : 0,
+              transform: loaded ? "translateX(0)" : "translateX(-50px)",
+              transition: "all 1s cubic-bezier(0.2, 0.9, 0.4, 1.2) 0.2s",
+            }}
+          >
+            <h1 className="font-['Cormorant_Garamond',serif] text-white font-bold text-5xl sm:text-6xl xl:text-7xl leading-[1.2] tracking-tight">
+              FROM OUR HUB <br />
+              TO YOUR HOME
+            </h1>
+ 
+            <p className="mt-6 text-gray-200 text-base max-w-md leading-relaxed border-l-2 border-amber-500/50 pl-5 backdrop-blur-sm bg-black/20 rounded-r-lg pr-2">
+              We believe cooking should be joyful, not stressful. That's why every recipe on{" "}
+              <span className="font-['Parisienne',cursive] text-amber-400 text-2xl md:text-3xl mb-3">
+                RecipieHub{" "}
+              </span>
+              is carefully curated, easy to follow, and absolutely delicious.
+            </p>
+ 
+ 
+            {/* ── Recipe Search lives here ── */}
+            <RecipeSearch />
+          </div>
         </div>
       </div>
-
-    </div>
-  </div>
-
-  <style>{`
-    @keyframes floatParticle {
-      0% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.3; }
-      100% { transform: translateY(-35px) translateX(12px) rotate(12deg); opacity: 0.8; }
-    }
-    @keyframes slowFloatPlate {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-18px) rotate(2deg); }
-    }
-    @keyframes gentleFloat {
-      0% { transform: translateY(0px) scale(1); }
-      100% { transform: translateY(-20px) scale(1.02); }
-    }
-  `}</style>
-</section>
+ 
+      <style>{`
+        @keyframes floatParticle {
+          0%   { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.3; }
+          100% { transform: translateY(-35px) translateX(12px) rotate(12deg); opacity: 0.8; }
+        }
+        @keyframes slowFloatPlate {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50%       { transform: translateY(-18px) rotate(2deg); }
+        }
+        @keyframes gentleFloat {
+          0%   { transform: translateY(0px) scale(1); }
+          100% { transform: translateY(-20px) scale(1.02); }
+        }
+      `}</style>
+    </section>
   );
 }
 
@@ -784,61 +633,7 @@ function NewsletterSection() {
   );
 }
 
-// ─── Footer ──────────────────────────────────────────────────────────────
-function Footer() {
-  return (
-    <footer className="bg-[#060403] pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div>
-            <span className="font-['Parisienne',cursive] text-3xl text-amber-400">Recipe Hub</span>
-            <p className="text-gray-500 text-sm mt-3">Discover, cook, and share delicious recipes from around the world.</p>
-          </div>
-          
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-white text-sm uppercase tracking-wider font-semibold">Quick Links</h4>
-            <ul className="mt-4 space-y-2 text-gray-500 text-sm">
-              <li className="hover:text-amber-400 cursor-pointer transition">Home</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">About Us</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Recipes</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Saved Recipes</li>
-            </ul>
-          </div>
-          
-          {/* Categories */}
-          <div>
-            <h4 className="text-white text-sm uppercase tracking-wider font-semibold">Categories</h4>
-            <ul className="mt-4 space-y-1 text-gray-500 text-sm">
-              <li className="hover:text-amber-400 cursor-pointer transition">Breakfast</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Lunch</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Dinner</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Dessert</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Vegetarian</li>
-            </ul>
-          </div>
-          
-          {/* Contact & Social */}
-          <div>
-            <h4 className="text-white text-sm uppercase tracking-wider font-semibold">Get in Touch</h4>
-            <ul className="mt-4 space-y-1 text-gray-500 text-sm">
-              <li>hello@recipehub.com</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Instagram</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Facebook</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Pinterest</li>
-              <li className="hover:text-amber-400 cursor-pointer transition">Twitter</li>
-            </ul>
-          </div>
-        </div>
-        
-        <div className="border-t border-white/10 mt-12 pt-6 text-center text-gray-600 text-xs">
-          © {new Date().getFullYear()} Recipe Hub. All rights reserved. | Made with ❤️ for home cooks
-        </div>
-      </div>
-    </footer>
-  );
-}
+
 
 // ─── Root Component ──────────────────────────────────────────────────────
 export default function HomePage() {
@@ -884,14 +679,12 @@ export default function HomePage() {
         }
       `}</style>
       
-      <Navbar />
       <Hero />
       <OurStory />
       <MenuSection />
       <EventsSection />
       <IngredientsSection />
       <NewsletterSection />
-      <Footer />
     </div>
   );
 }

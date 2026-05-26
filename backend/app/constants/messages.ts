@@ -1,0 +1,35 @@
+export const MESSAGES = {
+  AUTH: {
+    VERIFICATION_CODE_SENT: 'Verification code sent to your email',
+    REGISTRATION_SUCCESS: 'Registration successful',
+    REGISTRATION_FAILED: 'Registration failed',
+    VERIFICATION_FAILED: 'Verification failed',
+    LOGIN_SUCCESS: 'Login successful',
+    INVALID_CREDENTIALS: 'Invalid credentials',
+    LOGOUT_SUCCESS: 'Logged out successfully',
+    NEW_CODE_SENT: 'A new verification code has been sent to your email.',
+    RESEND_CODE_FAILED: 'Unable to resend code',
+    RESET_CODE_SENT: 'A reset code has been sent to your email.',
+    SEND_RESET_CODE_FAILED: 'Unable to send reset code',
+    OTP_VERIFIED: 'OTP verified',
+    INVALID_OTP: 'Invalid or expired OTP',
+    PASSWORD_RESET_SUCCESS: 'Password reset successful',
+    PASSWORD_RESET_FAILED: 'Password reset failed',
+    PASSWORDS_DO_NOT_MATCH: 'Passwords do not match',
+  },
+  USER: {
+    PROFILE_UPDATED: 'Profile updated successfully',
+    PREFERENCES_UPDATED: 'Preferences updated successfully',
+    AVATAR_UPDATED: 'Avatar updated successfully',
+    PASSWORD_CHANGED: 'Password changed successfully',
+  },
+  RECIPES: {
+    NOT_FOUND: 'Recipe not found',
+    FAVORITE_ADDED: 'Added to favorites',
+    FAVORITE_REMOVED: 'Removed from favorites',
+  },
+  COMMON: {
+    SERVER_ERROR: 'Internal server error',
+    NOT_FOUND: 'Resource not found',
+  },
+}

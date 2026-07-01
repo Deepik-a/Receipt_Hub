@@ -53,7 +53,7 @@ export default class RecipeServiceImpl implements IRecipeService {
       ...params,
       query: params.query,
       cuisine: params.cuisine ?? this._joinList(prefs.cuisines),
-      diet: params.diet ?? prefs.diet,
+      diet: params.diet ?? (prefs.diet ?? undefined),
       intolerances: params.intolerances ?? this._joinList(prefs.intolerances),
       includeIngredients: params.includeIngredients ?? this._joinList(prefs.includeIngredients),
       excludeIngredients: params.excludeIngredients ?? this._joinList(prefs.excludeIngredients),
@@ -62,7 +62,7 @@ export default class RecipeServiceImpl implements IRecipeService {
     }
   }
 
-  private _joinList(values?: string[]): string | undefined {
+  private _joinList(values?: string[] | null): string | undefined {
     if (!values?.length) {
       return undefined
     }

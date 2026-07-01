@@ -6,7 +6,7 @@ import OtpService from '#services/otp_service'
 import MailService from '#services/mail_service'
 import PendingRegistrationService from '#services/pending_registration_service'
 
-@inject()
+
 import { AuthService } from '#interfaces/auth_service'
 import type {
   RegisterUserDto,
